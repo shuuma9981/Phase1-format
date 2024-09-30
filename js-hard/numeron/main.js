@@ -1,54 +1,46 @@
-(function () {
-    const n = document.createElement("link").relList;
-    if (n && n.supports && n.supports("modulepreload")) return;
-    for (const e of document.querySelectorAll('link[rel="modulepreload"]')) i(e);
-    new MutationObserver((e) => {
-        for (const t of e)
-            if (t.type === "childList")
-                for (const c of t.addedNodes) c.tagName === "LINK" && c.rel === "modulepreload" && i(c);
-    }).observe(document, { childList: !0, subtree: !0 });
-    function l(e) {
-        const t = {};
-        return (
-            e.integrity && (t.integrity = e.integrity),
-            e.referrerPolicy && (t.referrerPolicy = e.referrerPolicy),
-            e.crossOrigin === "use-credentials"
-                ? (t.credentials = "include")
-                : e.crossOrigin === "anonymous"
-                    ? (t.credentials = "omit")
-                    : (t.credentials = "same-origin"),
-            t
-        );
+// 3桁の異なる数字を生成
+let 生成数字 = "";
+while (生成数字.length < 3) {
+    let 文字列 = Math.floor(Math.random() * 10).toString(); // 0〜9のランダムな数字
+    if (生成数字.indexOf(文字列) === -1) { // 同じ数字がなければ追加
+        生成数字 += 文字列;
     }
-    function i(e) {
-        if (e.ep) return;
-        e.ep = !0;
-        const t = l(e);
-        fetch(e.href, t);
-    }
-})();
+}
 
-const s = document.getElementById("numCheck");
-let o;
-for (
-    ;
-    (o = String(Math.floor(Math.random() * 900 + 100))),
-    !(o[0] !== o[1] && o[1] !== o[2] && o[0] !== o[2]);
+console.log("生成数字: " + 生成数字); // デバッグ用
 
-);
 
-s.addEventListener("click", function () {
-    const r = document.getElementById("answerNum").value;
-    if (((document.getElementById("answerNum").value = ""), r.length != 3)) {
-        alert("3桁の数を入れて下さい");
-        return;
-    } else if (r[0] === r[1] || r[1] === r[2] || r[0] === r[2]) {
-        alert("同じ数を2回使ってはいけません");
+// 「答え合わせ」ボタンがクリックされたときの処理
+document.getElementById("numCheck").onclick = function () {
+    let 入力数字 = document.getElementById("answerNum").value; // ユーザーの入力値を取得
+    document.getElementById("answerNum").value = ""; // 入力欄をクリア
+
+    // 入力値が3桁か確認し、同じ数字が使われていないかをチェック
+    if (入力数字.length !== 3 || 入力数字[0] === 入力数字[1] ||
+        入力数字[1] === 入力数字[2] || 入力数字[0] === 入力数字[2]) {
+        alert("3桁の異なる数字を入力してください");
         return;
     }
-    let n = 0,
-        l = 0;
-    for (let i = 0; i < r.length; i++)
-        for (let e = 0; e < o.length; e++) r[i] === o[e] && (i === e ? (n = n + 1) : (l = l + 1));
-    alert(`${n} EAT, ${l} BITE`), n === 3 && (alert("正解です！"), location.reload());
-});
+
+    let eat = 0;
+    let bite = 0;
+
+    // EATとBITEを数える
+    for (let i = 0; i < 3; i++) {
+        if (入力数字[i] === 生成数字[i]) {
+            eat += 1; // 数字も位置も一致 → EAT
+        } else if (生成数字.indexOf(入力数字[i]) !== -1) {
+            bite += 1; // 数字は一致、位置は不一致 → BITE
+        }
+    }
+
+    // EATとBITEの結果を表示
+    alert(eat + " EAT, " + bite + " BITE");
+
+    // 3EATなら正解、ゲームをリロード
+    if (eat === 3) {
+        alert("正解です！");
+        location.reload();
+    }
+};
+
